@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -19,7 +20,7 @@ class RoomController extends Controller
     public function createRoom(Request $request){
         $room = new Room;
         $room->name = $request->name;
-        $room->capacity = $reques->capacity;
+        $room->capacity = $request->capacity;
         $room->save();
 
         return response()->json([
@@ -31,7 +32,7 @@ class RoomController extends Controller
 
     public function editRoom(Request $request, $id){
         $room = Room::find($id);
-        $room->name = $reques->name;
+        $room->name = $request->name;
         $room->capacity = $request->capacity;
         $room->save();
 
