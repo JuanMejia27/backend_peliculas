@@ -13,6 +13,6 @@ class Actor extends Model
     protected $fillable = [
         "id",
         "name",
-        "photo"
+        "image"
     ];
 }

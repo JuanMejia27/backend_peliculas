@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('serie', function (Blueprint $table) {
-            table->increments("id")->unsigned();
+        Schema::create('series', function (Blueprint $table) {
+            $table->increments("id")->unsigned();
             $table->string("title");
             $table->string("description");
             $table->string("image");
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sells');
+        Schema::dropIfExists('series');
 
     }
 };
