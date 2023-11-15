@@ -6,7 +6,6 @@ use App\Models\Actor;
 use App\Models\ActorSerie;
 use App\Models\Genre;
 use App\Models\GenreSerie;
-use App\Models\Movie;
 use App\Models\Serie;
 use Exception;
 use Illuminate\Http\Request;
@@ -102,14 +101,64 @@ class SerieController extends Controller
     }
 
     public function editSerie(Request $request, $id){
+        try{
+            DB::beginTransaction();//uso de la base de datos
 
+            $serie = Serie::find($id);
+            $serie->title = $request->title;
+            $serie->description = $request->description;
+            $serie->image = $request->image;
+            $serie->duration = $request->duration;
+            $serie->id_clasification = $request->clasification;
+            $serie->save();
+
+            ActorSerie::where("id_serie",$serie->id)->delete();
+            GenreSerie::where("id_serie",$serie->id)->delete();
+
+            $actors = explode(",",$request->actors);
+            foreach($actors as $actor){
+                $item = Actor::where("name", "like", $actor)->first();
+                $actorserie = new ActorSerie;
+                $actorserie->id_actor = $item->id;
+                $actorserie->id_serie = $serie->id;
+                $actorserie->save();
+            }
+
+            $genre = explode(",", $request->genre);
+            foreach($genre as $gen){
+                $item = Genre::where("name", "like", $gen)->first();
+                $genreserie = new GenreSerie;
+                $genreserie->id_genre = $item->id;
+                $genreserie->id_serie = $serie->id;
+                $genreserie->save();
+            }
+
+            DB::commit();
+            //DB::rollBack();
+
+            return response()->json([
+                "code" => 200,
+                "message" => "Success",
+                "payload" => $serie
+            ]);
+        }
+        catch(Exception $e){
+            Log::error($e);
+            DB::rollBack();
+
+            return response()->json([
+                "code" => 500,//codigo de error
+                "message" => "Error",
+                "error" => $e
+            ]);
+        }
     }
 
     public function deleteSerie($id){
         ActorSerie::where("id_serie",$id)->delete();
         GenreSerie::where("id_serie",$id)->delete();
 
-        Movie::destroy($id);
+        serie::destroy($id);
         return response()->json([
             "code" => 200,
             "message" => "Success"
